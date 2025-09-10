@@ -12,10 +12,12 @@ This repository provides a simulation framework using k-Wave to reproduce experi
 ### Prerequisites
 
 - MATLAB (recommended version: R2020a or later)
-- statisitical machine-learing toolbox whic
+- statisitical machine-learing toolbox 
 - [k-Wave Toolbox](https://www.k-wave.org/)
 - This repository (clone or download)
-
+- (recommended) computer with gpus  
+   to test these prerequisites, execute k-wave tutorial codes in `arcaiv/` dir  
+   
 ### Directory Structure
 
 - `config.json`: Main configuration file for simulation parameters.
@@ -26,27 +28,16 @@ This repository provides a simulation framework using k-Wave to reproduce experi
 
 ## Workflow
 
-1. **Generate Pipe and Particle Locations**
+1. **Generate Pipe and Particle Locations and Visualize Sample Input**
 
-   Use `pipe_location_gen.m` to generate seed files specifying the locations of pipes and particles. These files are saved in the `location_seed/` directory.
+   Use `pipe_location_gen.m` to generate seed files specifying the locations of pipes and particles. When you run this script, it will also automatically execute `sampleplot.m` to visualize a sample input signal. The generated seed files are saved in the `location_seed/` directory.
 
    ```matlab
-   % Example: Generate location seeds
+   % Example: Generate location seeds and plot a sample input signal
    run('tutorials/pipe_location_gen.m')
    ```
 
-2. **Run Sample Plot and Tutorial Scripts**
-
-   You can visualize and understand the simulation setup using the provided tutorial scripts. For example, `sampleplot.m` and `sandbox.m` in the `tutorials/` directory help you plot the input signals and inspect the simulation domain.
-
-   ```matlab
-   % Example: Plot a sample input signal
-   run('tutorials/sampleplot.m')
-   % Example: Run a sandbox simulation
-   run('tutorials/sandbox.m')
-   ```
-
-3. **Data Generation**
+2. **Data Generation**
 
    The main data generation script reads the configuration and seed files, sets up the simulation domain, and runs the numerical simulation. The results are saved in the specified output directory.
 
@@ -65,7 +56,7 @@ This repository provides a simulation framework using k-Wave to reproduce experi
 
 - The simulation assumes no net flow due to the short timescale of ultrasonic propagation.
 - You can modify the number of particles, pipe dimensions, and other parameters in `config.json`.
-- Generated datasets can be used for training and validating machine learning models.
+- Generated datasets can be used for training and validating machine learning models. see my repo `ml-airlift`
 
 ## References
 
