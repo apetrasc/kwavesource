@@ -1,68 +1,57 @@
 # kwavesource
 
-![abstruct of simulation](./documents/pictures/multicombined_visualization_transparent.png)
+![シミュレーション概要](./documents/pictures/multicombined_visualization_transparent.png)
 
+## 概要
 
-## Overview
+k-Wave を用いて、超音波と流体を含む実験セットアップを数値的に再現し、機械学習向けの高品質データセットを生成するシミュレーション基盤です。水中のパイプや粒子など、複雑な媒質中での超音波伝搬を模擬します。
 
-This repository provides a simulation framework using k-Wave to reproduce experimental setups involving ultrasound and fluids. The main goal is to generate high-quality datasets for machine learning applications by numerically simulating ultrasonic wave propagation in complex media, such as pipes and particles in water.
+## はじめに
 
-## Getting Started
-
-### Prerequisites
-
-- MATLAB (recommended version: R2020a or later)
-- statisitical machine-learing toolbox 
+### 前提条件
+- MATLAB（推奨: R2020a 以降）
+- Statistical Machine Learning Toolbox
 - [k-Wave Toolbox](https://www.k-wave.org/)
-- This repository (clone or download)
-- (recommended) computer with gpus  
-   to test these prerequisites, execute k-wave tutorial codes in `arcaiv/` dir  
-   
-### Directory Structure
+- 本リポジトリ（クローンまたはダウンロード）
+- 推奨: GPU 搭載マシン  
+  動作確認: `arcaiv/` 内の k-Wave チュートリアルコードを実行してください。
 
-- `config.json`: Main configuration file for simulation parameters.
-- `tutorials/`: Contains example scripts and sample plots.
-- `src/`: Source code for simulation and data generation.
-- `documents/`: Documentation and images.
-- `location_seed/`: Contains seed files for particle/pipe locations.
+### ディレクトリ構成
+- `config.json`: シミュレーションパラメータのメイン設定
+- `tutorials/`: サンプルスクリプトとプロット
+- `src/`: シミュレーションとデータ生成のソースコード
+- `documents/`: ドキュメントと画像
+- `location_seed/`: パイプや粒子位置のシードファイル
 
-## Workflow
+## ワークフロー
 
-1. **Generate Pipe and Particle Locations and Visualize Sample Input**
-
-   Use `pipe_location_gen.m` to generate seed files specifying the locations of pipes and particles. When you run this script, it will also automatically execute `sampleplot.m` to visualize a sample input signal. The generated seed files are saved in the `location_seed/` directory.
-
+1. **パイプ・粒子位置の生成とサンプル入力の可視化**
+   - `pipe_location_gen.m` で位置シードを生成し、同時に `sampleplot.m` で入力信号を可視化します。生成されたシードは `location_seed/` に保存されます。
    ```matlab
-   % Example: Generate location seeds and plot a sample input signal
+   % 例: 位置シード生成とサンプル信号プロット
    run('tutorials/pipe_location_gen.m')
    ```
 
-2. **Data Generation**
-
-   The main data generation script reads the configuration and seed files, sets up the simulation domain, and runs the numerical simulation. The results are saved in the specified output directory.
-
-   - The script automatically loads the configuration from `config.json`.
-   - It reads the location seed files from the folder specified in the config.
-   - Simulation results (e.g., pressure fields, sensor data) are saved for further analysis or machine learning.
-
+2. **データ生成**
+   - メインのデータ生成スクリプトが設定とシードを読み込み、シミュレーション領域を構築して数値計算を実行します。結果は指定ディレクトリに保存されます。
+   - `config.json` から設定を自動読み込み
+   - config で指定したフォルダから位置シードを読み込み
+   - 圧力場やセンサーデータなどを保存（機械学習向けに利用可能）
    ```matlab
-   % Example: Run data generation
+   % 例: データ生成の実行
    run('src/data_generation.m')
    ```
+   - ディレクトリ構成を変更した場合は `config.json` のパスを更新してください。
 
-   Make sure to update the paths in `config.json` if you change the directory structure.
+## 注意事項
+- 超音波の短時間スケールを想定し、流れはないものとしています。
+- 粒子数やパイプ寸法などのパラメータは `config.json` で変更できます。
+- 生成データセットは機械学習モデルの学習や検証に利用できます（関連リポジトリ: `ml-airlift`）。
 
-## Notes
-
-- The simulation assumes no net flow due to the short timescale of ultrasonic propagation.
-- You can modify the number of particles, pipe dimensions, and other parameters in `config.json`.
-- Generated datasets can be used for training and validating machine learning models. see my repo `ml-airlift`
-
-## References
-
+## 参考
 - [k-Wave Documentation](https://www.k-wave.org/documentation/)
-- See `documents/` for additional figures and explanations.
+- 追加の図や解説は `documents/` を参照してください。
 
-## Contact
+## 連絡先
+質問やコントリビューションは Issue を立てるか、メンテナに連絡してください。
 
-For questions or contributions, please open an issue or contact the repository maintainer.
