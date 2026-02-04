@@ -22,6 +22,13 @@
             "alpha_power": 2,
             "BonA": 6
         },
+        "acrylic": {
+            "sound_speed": 2730,
+            "density": 1180,
+            "alpha_coeff": 0.17,
+            "alpha_power": 2,
+            "BonA": 6
+        },
         "glass": {
             "sound_speed": 5789,
             "density": 2240,
@@ -83,13 +90,11 @@
         "pml_alpha": 2,
         "CFL": 0.03,
         "num_dataset": 10,
-        "num_particles": 44,
+        "num_particles": 46,
         "glass_radius": 1.25e-3,
         "distance_particles":0.25
     },
     "save_path": "/mnt/matsubara/rawdata",
     "location_seedfiles_path": "/mnt/matsubara/location_seed",
-    "save_logs_path": "/mnt/matsubara/logs",
-    "save_data_path": "/mnt/matsubara/signals_sim",
     "save_full_path":"/mnt/matsubara/tmp"
 } 

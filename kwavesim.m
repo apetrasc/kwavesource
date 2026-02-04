@@ -131,8 +131,8 @@ function kwavesim(config_file, location_csv, locnum_str)
     ringMask = (ring2d <= outer_r) & (ring2d >= inner_r);
 
     pipe_mask = repmat(ringMask, [1 1 Nz]);
-    medium.sound_speed(pipe_mask == 1) = config.medium.vinyl.sound_speed;
-    medium.density(pipe_mask == 1) = config.medium.vinyl.density;
+    medium.sound_speed(pipe_mask == 1) = config.medium.acrylic.sound_speed;
+    medium.density(pipe_mask == 1) = config.medium.acrylic.density;
 
     % Glass mask
     % Read coordinates from locationX.csv
@@ -169,10 +169,11 @@ function kwavesim(config_file, location_csv, locnum_str)
     scan_line = transducer_transmit.scan_line(sensor_data);
     figure(1);
     plot(kgrid.t_array * 1e6, scan_line * 1e-6, 'b-');
-    xlabel('Time [\mus]');
-    ylabel('Pressure [MPa]');
+    xlabel('Time [\mus]', 'FontSize', 18);
+    ylabel('Pressure [MPa]', 'FontSize', 18);
     ylim([-2 2]);
-    title('Signal from Transducer transmit');
+    title('Signal from Transducer transmit', 'FontSize', 20);
+    set(gca, 'FontSize', 16);
     grid on;
     saveas(gcf, fullfile(save_logs_path, ['signal_solid_liquid_reflector' locnum_str '.png']));
 
@@ -217,10 +218,11 @@ function kwavesim(config_file, location_csv, locnum_str)
     xlim([1, Nx]);
     ylim([1, Ny]);
     zlim([1, Nz]);
-    xlabel('X');
-    ylabel('Y');
-    zlabel('Z');
-    title('Transducer, Sensor, and Pipe Mask Visualization');
+    xlabel('X', 'FontSize', 18);
+    ylabel('Y', 'FontSize', 18);
+    zlabel('Z', 'FontSize', 18);
+    title('Transducer, Sensor, and Pipe Mask Visualization', 'FontSize', 20);
+    set(gca, 'FontSize', 16);
     view(80, 20);
     camlight;
     lighting gouraud;

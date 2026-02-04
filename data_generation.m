@@ -15,8 +15,9 @@ function signalgen_module_all()
         error('No location*.csv files found in %s.', location_dir);
     end
     % Delete all files in the save_data_path directory before data generation
-    save_data_path = config.save_data_path;
-    save_logs_path = config.save_logs_path;
+    save_full_path = config.save_full_path;
+    save_data_path = fullfile(save_full_path, 'data');
+    save_logs_path = fullfile(save_full_path, 'logs');
 
     % Delete all files in the save_data_path directory before data generation
     if exist(save_data_path, 'dir')
