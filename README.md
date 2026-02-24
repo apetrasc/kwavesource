@@ -6,17 +6,33 @@
 
 k-Wave を用いて、超音波と流体を含む実験セットアップを数値的に再現し、機械学習向けの高品質データセットを生成するシミュレーション基盤です。水中のパイプや粒子など、複雑な媒質中での超音波伝搬を模擬します。
 
-## はじめに
+## Getting Started
 
-### 前提条件
-- MATLAB（推奨: R2020a 以降）
-- Statistical Machine Learning Toolbox
-- [k-Wave Toolbox](https://www.k-wave.org/)
-- 本リポジトリ（クローンまたはダウンロード）
-- 推奨: GPU 搭載マシン  
-  動作確認: `arcaiv/` 内の k-Wave チュートリアルコードを実行してください。
+### Prerequisites
 
-### ディレクトリ構成
+- MATLAB (recommended version: R2020a or later)
+- Statistics and Machine Learning Toolbox  
+  （例: mpm を用いたインストール）
+
+  ```bash
+  sudo ./mpm install \
+    --release R2024b \
+    --destination /usr/local/MATLAB/R2024b \
+    --products "Statistics and Machine Learning Toolbox"
+  ```
+
+- [k-Wave Toolbox](https://www.k-wave.org/)  
+  （例: k-Wave C++ バイナリに実行権限を付与）
+
+  ```bash
+  chmod +x /home/user/Matlab/k-Wave/binaries/kspaceFirstOrder-CUDA
+  ```
+- This repository (clone or download)
+- (recommended) computer with gpus  
+   to test these prerequisites, execute k-wave tutorial codes in `arcaiv/` dir  
+   
+### Directory Structure
+
 - `config.json`: シミュレーションパラメータのメイン設定
 - `tutorials/`: サンプルスクリプトとプロット
 - `src/`: シミュレーションとデータ生成のソースコード

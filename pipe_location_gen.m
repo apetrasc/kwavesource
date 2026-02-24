@@ -28,6 +28,7 @@ for i = 1:num_repeat
     end
     filename = fullfile(seedfiles_dir, sprintf('location%d.csv', i));
     writematrix(samples', filename); % Save as CSV (transpose to get m rows)
+    fprintf('Location seed saved to: %s\n', filename);
 end
 % XY plane scatter plot with unit circle
 figure;
@@ -146,8 +147,7 @@ function samples = glass_location_gen(m)
     max_attempts = 100000; % Prevent infinite loop
     attempts = 0;
     while count < m && attempts < max_attempts
-        % x, yはガウス分布、zは[-1,1]の一様分布からサンプリング
-        xy = mvnrnd([0, 0], eye(2), 1)'; % 2x1ベクトル
+        xy = randn(2,1);
         z = (1 - min_dist) * rand(1,1) + min_dist/2;   % zを[min_dist/2, 1-min_dist/2]の範囲で一様分布から生成
         candidate = [xy; z];             % 3x1 vec
         % Check if (X,Y) is inside unit circle
@@ -179,13 +179,19 @@ function samples = glass_location_gen(m)
         error('Could not generate enough samples in %d attempts. Try reducing min_dist or increasing max_attempts.', max_attempts);
     end
     
-    % Save samples to CSV file
-    csv_file = fullfile(seedfiles_dir, 'sample.csv');
+    % Save samples to CSV file (for debug/inspection)
+    % Save under the script directory to avoid permission issues under base_dir
+    csv_file = fullfile(script_dir, 'sample.csv');
     sample_table = array2table(samples', 'VariableNames', {'X', 'Y', 'Z'});
-    writetable(sample_table, csv_file);
-
-    fprintf('Generated %d samples from 3D Gaussian distribution\n', m);
-    fprintf('Samples saved to: %s\n', csv_file);
+    try
+        writetable(sample_table, csv_file);
+        fprintf('Generated %d samples from 3D Gaussian distribution\n', m);
+        % Path to sample.csv is omitted to reduce log noise
+    catch ME
+        warning('kwavesource:sampleSaveFailed', ...
+            'Could not save sample.csv. This does not affect location*.csv generation. Original error: %s', ...
+            ME.message);
+    end
     fprintf('\nSample Statistics:\n');
     fprintf('Mean X: %.4f, Y: %.4f, Z: %.4f\n', mean(samples(1,:)), mean(samples(2,:)), mean(samples(3,:)));
     fprintf('Std  X: %.4f, Y: %.4f, Z: %.4f\n', std(samples(1,:)), std(samples(2,:)), std(samples(3,:)));
