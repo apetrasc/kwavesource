@@ -2,8 +2,22 @@ function kwavesim(config_file, location_csv, locnum_str)
 % Main simulation logic for k-Wave, extracted for modular use.
 
     config = jsondecode(fileread(config_file));
-    save_logs_path = fullfile(config.save_full_path, 'logs');
-    save_data_path = fullfile(config.save_full_path, 'data');
+    
+    % Decide base directory for saving data/logs
+    if isfield(config, 'save_full_path')
+        % Backward compatibility: use explicit path if provided
+        save_full_path = config.save_full_path;
+    elseif isfield(config, 'base_dir')
+        % Default: use base_dir/tmp
+        save_full_path = fullfile(config.base_dir, 'tmp');
+    else
+        % Final fallback: tmp under this script's directory
+        script_dir = fileparts(mfilename('fullpath'));
+        save_full_path = fullfile(script_dir, 'tmp');
+    end
+
+    save_logs_path = fullfile(save_full_path, 'logs');
+    save_data_path = fullfile(save_full_path, 'data');
     % Check if save_logs_path exists, and create it if it does not exist
     if ~exist(save_logs_path, 'dir')
         mkdir(save_logs_path);
@@ -131,9 +145,9 @@ function kwavesim(config_file, location_csv, locnum_str)
     ringMask = (ring2d <= outer_r) & (ring2d >= inner_r);
 
     pipe_mask = repmat(ringMask, [1 1 Nz]);
-    medium.sound_speed(pipe_mask == 1) = config.medium.acrylic.sound_speed;
-    medium.density(pipe_mask == 1) = config.medium.acrylic.density;
-
+    medium.sound_speed(pipe_mask == 1) = config.medium.steel.sound_speed;
+    medium.density(pipe_mask == 1) = config.medium.steel.density;
+    medium.alpha_coeff(pipe_mask == 1) = config.medium.steel.alpha_coeff;
     % Glass mask
     % Read coordinates from locationX.csv
     location = csvread(location_csv);

@@ -1,12 +1,13 @@
-function signalgen_module_all()
+function data_generation()
 % This function reads config.json and sequentially runs signalgen_module for all location1.csv, location2.csv, ... in the specified directory.
 
     % Path to config file
-    config_file = 'config.json';
+    script_dir = fileparts(mfilename('fullpath'));
+    config_file = fullfile(script_dir, 'config.json');
 
     % Get location_seedfiles_path from config.json
     config = jsondecode(fileread(config_file));
-    location_dir = config.location_seedfiles_path;
+    location_dir = fullfile(config.base_dir, 'location_seed');
 
     % Get all location*.csv files
     files = dir(fullfile(location_dir, 'location*.csv'));
@@ -15,7 +16,7 @@ function signalgen_module_all()
         error('No location*.csv files found in %s.', location_dir);
     end
     % Delete all files in the save_data_path directory before data generation
-    save_full_path = config.save_full_path;
+    save_full_path = fullfile(config.base_dir, 'tmp');
     save_data_path = fullfile(save_full_path, 'data');
     save_logs_path = fullfile(save_full_path, 'logs');
 
@@ -66,7 +67,6 @@ function signalgen_module_all()
     end
     % Run signalgen_module for each CSV file
     % Initialize (delete all files and folders) in save_full_path directory before data generation
-    save_full_path = config.save_full_path;
     if exist(save_full_path, 'dir')
         files_to_delete = dir(fullfile(save_full_path, '*'));
         for k = 1:length(files_to_delete)
@@ -90,23 +90,30 @@ function signalgen_module_all()
     end
 
     % Copy config.json file to save_full_path
-    config_file_src = config_file; % assuming config_file is the path to config.json
+    config_file_src = config_file; % already absolute (script-relative)
     config_file_dst = fullfile(save_full_path, 'config.json');
     copyfile(config_file_src, config_file_dst);
     fprintf('config.json has been copied to %s.\n', save_full_path);
 
-    % Copy location_seed folder to save_full_path
-    location_seed_src = config.location_seedfiles_path;
-    [~, location_seed_folder] = fileparts(location_seed_src);
-    location_seed_dst = fullfile(save_full_path, location_seed_folder);
-    if exist(location_seed_dst, 'dir')
-        rmdir(location_seed_dst, 's');
+    % Copy location_seed directory into save_full_path for reproducibility
+    location_dir_dst = fullfile(save_full_path, 'location_seed');
+    if exist(location_dir_dst, 'dir')
+        rmdir(location_dir_dst, 's');
     end
-    copyfile(location_seed_src, location_seed_dst);
-    fprintf('location_seed folder has been copied to %s.\n', save_full_path);
+    copyfile(location_dir, location_dir_dst);
+    fprintf('location_seed has been copied to %s.\n', location_dir_dst);
+
+    % Re-scan location*.csv from the copied folder
+    files = dir(fullfile(location_dir_dst, 'location*.csv'));
+    fprintf('--- %d location*.csv files found (copied). ---\n', length(files));
+    if isempty(files)
+        error('No location*.csv files found in %s.', location_dir_dst);
+    end
+
     for i = 1:length(files)
-        location_csv = fullfile(location_dir, files(i).name);
+        location_csv = fullfile(location_dir_dst, files(i).name);
         fprintf('--- Processing %s ---\n', location_csv);
-        simulation_execution(config_file, location_csv);
+        % Use the copied config for the simulation run
+        simulation_execution(config_file_dst, location_csv);
     end
 end
