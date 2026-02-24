@@ -13,11 +13,20 @@ for i = 1:num_repeat
         error('Configuration file not found: %s', config_file);
     end
     config = jsondecode(fileread(config_file));
-    save_path = config.location_seedfiles_path;
-    if ~exist(save_path, 'dir')
-        mkdir(save_path);
+    % Determine seedfiles_dir in a robust way
+    if isfield(config, 'seedfiles_dir')
+        seedfiles_dir = config.seedfiles_dir;
+    elseif isfield(config, 'base_dir')
+        seedfiles_dir = fullfile(config.base_dir, 'location_seed');
+    else
+        % Fallback: use directory of this script
+        script_dir = fileparts(mfilename('fullpath'));
+        seedfiles_dir = fullfile(script_dir, 'location_seed');
     end
-    filename = fullfile(save_path, sprintf('location%d.csv', i));
+    if ~exist(seedfiles_dir, 'dir')
+        mkdir(seedfiles_dir);
+    end
+    filename = fullfile(seedfiles_dir, sprintf('location%d.csv', i));
     writematrix(samples', filename); % Save as CSV (transpose to get m rows)
 end
 % XY plane scatter plot with unit circle
@@ -32,7 +41,7 @@ ylabel('Y');
 title('Sample points and unit circle in XY plane');
 grid on;
 axis equal;
-saveas(gcf, fullfile(save_path, 'pipeplot.png'));
+saveas(gcf, fullfile(seedfiles_dir, 'pipeplot.png'));
 
 % XZ plane projection (z from 0 to 1, square from -1 to 1 in X)
 figure;
@@ -47,7 +56,7 @@ ylabel('Z');
 title('Sample points and [0,1] square in XZ plane');
 grid on;
 axis equal;
-saveas(gcf, fullfile(save_path, 'pipeplot_xz.png'));
+saveas(gcf, fullfile(seedfiles_dir, 'pipeplot_xz.png'));
 
 % YZ plane projection (z from 0 to 1, square from -1 to 1 in Y)
 figure;
@@ -62,7 +71,7 @@ ylabel('Z');
 title('Sample points and [0,1] square in YZ plane');
 grid on;
 axis equal;
-saveas(gcf, fullfile(save_path, 'pipeplot_yz.png'));
+saveas(gcf, fullfile(seedfiles_dir, 'pipeplot_yz.png'));
 
 % 3D scatter plot with unit cylinder overlay
 figure;
@@ -84,8 +93,8 @@ title('3D sample points and unit cylinder');
 grid on;
 axis equal;
 hold off;
-saveas(gcf, fullfile(save_path, 'pipeplot_3d.png'));
-fprintf('plot saved to %s\n', save_path);
+saveas(gcf, fullfile(seedfiles_dir, 'pipeplot_3d.png'));
+fprintf('plot saved to %s\n', seedfiles_dir);
 % --- 関数定義部分（同じファイルの末尾、または別ファイルに分離）---
 function samples = glass_location_gen(m)
     % SAMPLING - Sample from 3D Gaussian distribution
@@ -96,8 +105,9 @@ function samples = glass_location_gen(m)
     % Outputs:
     %   samples - 3xm array containing the sampled points
     
-    % Read configuration file
-    config_file = 'config.json';
+    % Read configuration file (always relative to this script's directory)
+    script_dir = fileparts(mfilename('fullpath'));
+    config_file = fullfile(script_dir, 'config.json');
     if ~exist(config_file, 'file')
         error('Configuration file not found: %s', config_file);
     end
@@ -109,15 +119,19 @@ function samples = glass_location_gen(m)
     fclose(fid);
     config = jsondecode(str);
     
-    % Extract save path from configuration
-    if ~isfield(config, 'save_path')
-        error('save_path not found in configuration file');
+    % Extract save path from configuration (keep logic consistent with main script)
+    if isfield(config, 'seedfiles_dir')
+        seedfiles_dir = config.seedfiles_dir;
+    elseif isfield(config, 'base_dir')
+        seedfiles_dir = fullfile(config.base_dir, 'location_seed');
+    else
+        % Final fallback: use directory of this script
+        seedfiles_dir = fullfile(script_dir, 'location_seed');
     end
-    save_path = config.save_path;
     
     % Create save directory if it doesn't exist
-    if ~exist(save_path, 'dir')
-        mkdir(save_path);
+    if ~exist(seedfiles_dir, 'dir')
+        mkdir(seedfiles_dir);
     end
     
     % Sample from 3D Gaussian (mean 0, var 1), keep only those inside unit circle in XY plane,
@@ -166,7 +180,7 @@ function samples = glass_location_gen(m)
     end
     
     % Save samples to CSV file
-    csv_file = fullfile(save_path, 'sample.csv');
+    csv_file = fullfile(seedfiles_dir, 'sample.csv');
     sample_table = array2table(samples', 'VariableNames', {'X', 'Y', 'Z'});
     writetable(sample_table, csv_file);
 
@@ -190,7 +204,7 @@ function samples = glass_location_gen(m)
     % title('Sample points and unit circle in XY plane');
     % grid on;
     % axis equal;
-    % saveas(gcf, fullfile(save_path, 'pipeplot.png'));
+    % saveas(gcf, fullfile(seedfiles_dir, 'pipeplot.png'));
 
     % % XZ plane projection (z from 0 to 1, square from -1 to 1 in X)
     % figure;
@@ -205,7 +219,7 @@ function samples = glass_location_gen(m)
     % title('Sample points and [0,1] square in XZ plane');
     % grid on;
     % axis equal;
-    % saveas(gcf, fullfile(save_path, 'pipeplot_xz.png'));
+    % saveas(gcf, fullfile(seedfiles_dir, 'pipeplot_xz.png'));
 
     % % YZ plane projection (z from 0 to 1, square from -1 to 1 in Y)
     % figure;
@@ -220,7 +234,7 @@ function samples = glass_location_gen(m)
     % title('Sample points and [0,1] square in YZ plane');
     % grid on;
     % axis equal;
-    % saveas(gcf, fullfile(save_path, 'pipeplot_yz.png'));
+    % saveas(gcf, fullfile(seedfiles_dir, 'pipeplot_yz.png'));
 
     % % 3D scatter plot with unit cylinder overlay
     % figure;
@@ -242,8 +256,8 @@ function samples = glass_location_gen(m)
     % grid on;
     % axis equal;
     % hold off;
-    % saveas(gcf, fullfile(save_path, 'pipeplot_3d.png'));
-    % fprintf('plot saved to %s\n', save_path);
+    % saveas(gcf, fullfile(seedfiles_dir, 'pipeplot_3d.png'));
+    % fprintf('plot saved to %s\n', seedfiles_dir);
     % If you want to run the plotting script directly (optional, if available and path is correct):
     % try
     %     run(fullfile(fileparts(mfilename('fullpath')), 'tutorials', 'sampleplot.m'));
@@ -252,8 +266,4 @@ function samples = glass_location_gen(m)
     % end
 
 end
-% --- 英語での説明 ---
-% In MATLAB, you cannot define a function inside a script file and execute the script as a function.
-% To fix this, separate the script part (variable assignment and function call) from the function definition.
-% Place the function definition at the end of the file or in a separate file.
-% Then, run the script part to execute your code.
+
