@@ -146,8 +146,7 @@ function samples = glass_location_gen(m)
     max_attempts = 100000; % Prevent infinite loop
     attempts = 0;
     while count < m && attempts < max_attempts
-        % x, yはガウス分布、zは[-1,1]の一様分布からサンプリング
-        xy = mvnrnd([0, 0], eye(2), 1)'; % 2x1ベクトル
+        xy = randn(2,1);
         z = (1 - min_dist) * rand(1,1) + min_dist/2;   % zを[min_dist/2, 1-min_dist/2]の範囲で一様分布から生成
         candidate = [xy; z];             % 3x1 vec
         % Check if (X,Y) is inside unit circle
