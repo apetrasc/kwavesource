@@ -12,8 +12,22 @@ This repository provides a simulation framework using k-Wave to reproduce experi
 ### Prerequisites
 
 - MATLAB (recommended version: R2020a or later)
-- statisitical machine-learing toolbox 
-- [k-Wave Toolbox](https://www.k-wave.org/)
+- Statistics and Machine Learning Toolbox  
+  （例: mpm を用いたインストール）
+
+  ```bash
+  sudo ./mpm install \
+    --release R2024b \
+    --destination /usr/local/MATLAB/R2024b \
+    --products "Statistics and Machine Learning Toolbox"
+  ```
+
+- [k-Wave Toolbox](https://www.k-wave.org/)  
+  （例: k-Wave C++ バイナリに実行権限を付与）
+
+  ```bash
+  chmod +x /home/user/Matlab/k-Wave/binaries/kspaceFirstOrder-CUDA
+  ```
 - This repository (clone or download)
 - (recommended) computer with gpus  
    to test these prerequisites, execute k-wave tutorial codes in `arcaiv/` dir  
