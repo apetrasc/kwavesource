@@ -7,7 +7,13 @@ function data_generation()
 
     % Get location_seedfiles_path from config.json
     config = jsondecode(fileread(config_file));
-    location_dir = fullfile(config.base_dir, 'location_seed');
+    if isfield(config, 'seedfiles_dir')
+        location_dir = config.seedfiles_dir;
+    elseif isfield(config, 'base_dir')
+        location_dir = fullfile(config.base_dir, 'location_seed');
+    else
+        location_dir = fullfile(script_dir, 'location_seed');
+    end
 
     % Get all location*.csv files
     files = dir(fullfile(location_dir, 'location*.csv'));
@@ -15,57 +21,10 @@ function data_generation()
     if isempty(files)
         error('No location*.csv files found in %s.', location_dir);
     end
-    % Delete all files in the save_data_path directory before data generation
     save_full_path = fullfile(config.base_dir, 'tmp');
     save_data_path = fullfile(save_full_path, 'data');
     save_logs_path = fullfile(save_full_path, 'logs');
 
-    % Delete all files in the save_data_path directory before data generation
-    if exist(save_data_path, 'dir')
-        files_to_delete = dir(fullfile(save_data_path, '*'));
-        for k = 1:length(files_to_delete)
-            fname = files_to_delete(k).name;
-            % Skip '.' and '..'
-            if ~strcmp(fname, '.') && ~strcmp(fname, '..')
-                fpath = fullfile(save_data_path, fname);
-                if isfile(fpath)
-                    delete(fpath); % Delete file
-                elseif isfolder(fpath)
-                    % If there are subfolders, remove them recursively
-                    rmdir(fpath, 's');
-                end
-            end
-        end
-        fprintf('All files in %s have been deleted before data generation.\n', save_data_path);
-    else
-        % If the directory does not exist, create it
-        mkdir(save_data_path);
-        fprintf('Directory %s did not exist and was created.\n', save_data_path);
-    end
-
-    % Delete all files in the save_logs_path directory before data generation
-    if exist(save_logs_path, 'dir')
-        files_to_delete = dir(fullfile(save_logs_path, '*'));
-        for k = 1:length(files_to_delete)
-            fname = files_to_delete(k).name;
-            % Skip '.' and '..'
-            if ~strcmp(fname, '.') && ~strcmp(fname, '..')
-                fpath = fullfile(save_logs_path, fname);
-                if isfile(fpath)
-                    delete(fpath); % Delete file
-                elseif isfolder(fpath)
-                    % If there are subfolders, remove them recursively
-                    rmdir(fpath, 's');
-                end
-            end
-        end
-        fprintf('All files in %s have been deleted before data generation.\n', save_logs_path);
-    else
-        % If the directory does not exist, create it
-        mkdir(save_logs_path);
-        fprintf('Directory %s did not exist and was created.\n', save_logs_path);
-    end
-    % Run signalgen_module for each CSV file
     % Initialize (delete all files and folders) in save_full_path directory before data generation
     if exist(save_full_path, 'dir')
         files_to_delete = dir(fullfile(save_full_path, '*'));
@@ -88,6 +47,8 @@ function data_generation()
         mkdir(save_full_path);
         fprintf('Directory %s did not exist and was created.\n', save_full_path);
     end
+    mkdir(save_data_path);
+    mkdir(save_logs_path);
 
     % Copy config.json file to save_full_path
     config_file_src = config_file; % already absolute (script-relative)
